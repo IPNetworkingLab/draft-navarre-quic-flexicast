@@ -5,8 +5,8 @@
 QUIC                                                          L. Navarre
 Internet-Draft                                                 UCLouvain
 Intended status: Experimental                             O. Bonaventure
-Expires: 8 January 2026                                UCLouvain & WELRI
-                                                             7 July 2025
+Expires: 2 May 2026                                    UCLouvain & WELRI
+                                                         29 October 2025
 
 
     Flexicast QUIC: combining unicast and multicast in a single QUIC
@@ -50,7 +50,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 8 January 2026.
+   This Internet-Draft will expire on 2 May 2026.
 
 Copyright Notice
 
@@ -140,7 +140,11 @@ Table of Contents
    Multicast extensions to QUIC have already been proposed in
    [I-D.pardue-quic-http-mcast] and [I-D.jholland-quic-multicast-05].
    To our knowledge, these extensions have not been fully implemented
-   and deployed.
+   and deployed.  Additionally, these solutions suggest to share a QUIC
+   connection between multiple receivers from a specific source, as well
+   as individual connections.  This design requires applications to
+   handle two distinct connections in case of packet losses and
+   multicast failures.
 
    Flexicast QUIC takes a different approach.  Instead of extending QUIC
    [QUIC-TRANSPORT], Flexicast QUIC extends Multipath QUIC
@@ -195,20 +199,19 @@ Table of Contents
    point that smartphone and the server have two paths to exchange data:
    the first over the cellular interface and the second over the Wi-Fi
    interface.  Each path uses a different sequence number space, but
-   QUIC packets are encrypted using the same connection keys over both
-   paths.  When a QUIC packet needs to be sent, the packet scheduler
-   selects the relevant path.  If a QUIC frame is lost over one path, it
-   can be retransmitted over any other path.
+   QUIC packets are encrypted using the same connection keys using a
+   per-path IV construct.  When a QUIC packet needs to be sent, the
+   packet scheduler selects the relevant path.  If a QUIC frame is lost
+   over one path, it can be retransmitted over any other path.
 
-   Flexicast QUIC extends Multipath QUIC by requiring that each path
-   uses different encryption and decryption keys.  As such, multiple
-   clients can share the same additional path which is encrypted with a
-   different key than their respective unicast path.  The IP destination
-   address of this new, shared path MAY be a multicast address, so that
-   all receivers attached to this multicast tree receive the same
-   packet.
+   Flexicast QUIC extends Multipath QUIC by using different encryption
+   and decryption keys.  As such, multiple clients can share the same
+   additional path which is encrypted with a different key than their
+   respective unicast path.  The IP destination address of this new,
+   shared path MAY be a multicast address, so that all receivers
+   attached to this multicast tree receive the same packet.
 
-   The case were the IP destination address is _not_ an IP multicast
+   The case where the IP destination address is _not_ an IP multicast
    address is discussed later in this document.  In this case, Flexicast
    QUIC uses packet replication at the source, e.g., using sendmmsg,
    using the unicast destination address of the receivers.  This
@@ -216,18 +219,18 @@ Table of Contents
    encrypts only one packet, and duplicating the bytes is
    straightforward.
 
-   A Flexicast QUIC connection starts with a handshake like a regular
-   QUIC connection.  Receivers R1, R2 and R3 establish a connection to
-   source S using the flexicast_support and the initial_max_path_id
-   transport parameters.  The initial path between each receiver and the
-   source are individually secured using the keys derived at connection
-   establishement.  They remain open during the whole communication and
-   constitute a unicast bidirectional path between the source and each
-   receiver.  This path is used for two very different purposes.  First,
-   it acts as a control channel and enables the source to exchange
-   control information with each receiver.  Second, it can be used to
-   transmit or retransmit data that cannot be delivered along the
-   multicast tree.
+   A Flexicast QUIC connection starts with a unicast handshake,
+   similarly to a regular QUIC connection.  Receivers R1, R2 and R3
+   establish a connection to source S using the flexicast_support and
+   the initial_max_path_id transport parameters.  The initial path
+   between each receiver and the source are individually secured using
+   the keys derived at connection establishement.  It remains open
+   during the whole flexicast session and constitute a unicast
+   bidirectional path between the source and each receiver.  This path
+   is used for two very different purposes.  First, it acts as a control
+   channel and enables the source to exchange control information with
+   each receiver.  Second, it can be used to transmit or retransmit data
+   that cannot be delivered along the multicast tree.
 
    Most of the data sent over a Flexicast QUIC connection is transmitted
    along what we call a flexicast flow.  A *flexicast flow* is a
@@ -291,13 +294,13 @@ Table of Contents
      source and each receiver and (2) a flexicast flow from the source
        to a set of receivers relying on a multicast distribution tree
 
-   At any point in time, if the network conditions of a receiver of a
-   flexicast flow degrade, e.g., because the underlying multicast tree
-   fails or because the receiver moves into a non-multicast network, it
-   can leave the flexicast flow and continue receiving content through
-   its unicast path.  The seamless transition between a flexicast flow
-   and a unicast path is possible because these are Multipath QUIC
-   paths.
+   Transitions between sending application data on a flexicast flow and
+   a unicast path is seamless thanks to the underlying Multipath QUIC
+   extension.  At any point in time, if the network conditions of a
+   receiver of a flexicast flow degrade, e.g., because the underlying
+   multicast tree fails or because the receiver moves into a non-
+   multicast network, it can leave the flexicast flow and continue
+   receiving content through its unicast path.
 
    Flexicast QUIC offers full reliability by retransmitting lost frames
    either to all receivers on the flexicast flow, or per-receiver using
@@ -346,16 +349,16 @@ Table of Contents
    to advertise the identifier of the multicast tree that the receivers
    can join.
 
-   The Flexicast QUIC packets that are sent over the flexicast flow must
-   be encrypted and authenticated.  However, these packets cannot be
+   The Flexicast QUIC packets that are sent over the flexicast flow are
+   be encrypted and authenticated.  However, these packets are not
    encrypted using the TLS keys derived during the QUIC connection
-   establishment since each unicast path has its own set of TLS keys.
-   To secure the transmission of Flexicast QUIC packets along the
-   flexicast flow, the source generates an independent set of security
-   keys and shares them using the FC_KEY frame (see Section 11.3) to all
-   receivers over the unicast path.  Since this frame is sent over the
-   unicast paths, it is authenticated and encrypted using the TLS keys
-   associated to each unicast path.
+   establishment since they are unique to the receiver.  To secure the
+   transmission of Flexicast QUIC packets along the flexicast flow, the
+   source generates an independent set of security keys and shares them
+   using the FC_KEY frame (see Section 11.3) to all receivers over the
+   unicast path.  Since this frame is sent over the unicast paths, it is
+   authenticated and encrypted using the TLS keys associated to each
+   unicast path.
 
    Section 10 gives more details on the modifications to
    [MULTIPATH-QUIC] to protect packets sent on the flexicast flow.
@@ -367,14 +370,13 @@ Table of Contents
    as specified in [QUIC-TRANSPORT].  The new transport parameter is
    defined as follows:
 
-   *  flexicast_support (current version uses TBD-03): the presence of
-      this transport parameter indicates support of the flexicast
-      extension.  The transport parameter contains two boolean values,
-      respectively indicating support of IPv4 and IPv6 for multicast
-      addresses.  If an endpoint receives the flexicast_support
-      transport parameter with both IPv4 and IPv6 supports set to false
-      (0), it must close the connection with an error type of
-      FC_PROTOCOL_VIOLATION.
+   *  flexicast_support (current version uses TBD-03): this transport
+      parameter indicates support of the flexicast extension.  The
+      transport parameter contains two boolean values, respectively
+      indicating support of IPv4 and IPv6 for multicast addresses.  If
+      an endpoint receives the flexicast_support transport parameter
+      with both IPv4 and IPv6 supports set to false (0), it must close
+      the connection with an error type of FC_PROTOCOL_VIOLATION.
 
    The support of the flexicast extension is conditioned to the support
    of the multipath extension, as defined in [MULTIPATH-QUIC].  Since a
@@ -1093,10 +1095,11 @@ Table of Contents
 
    [MULTIPATH-QUIC]
               Liu, Y., Ma, Y., De Coninck, Q., Bonaventure, O., Huitema,
-              C., and M. Kühlewind, "Multipath Extension for QUIC", Work
-              in Progress, Internet-Draft, draft-ietf-quic-multipath-14,
-              23 April 2025, <https://datatracker.ietf.org/doc/html/
-              draft-ietf-quic-multipath-14>.
+              C., and M. Kühlewind, "Managing multiple paths for a QUIC
+              connection", Work in Progress, Internet-Draft, draft-ietf-
+              quic-multipath-17, 20 October 2025,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
+              multipath-17>.
 
    [QUIC-TLS] Thomson, M., Ed. and S. Turner, Ed., "Using TLS to Secure
               QUIC", RFC 9001, DOI 10.17487/RFC9001, May 2021,
