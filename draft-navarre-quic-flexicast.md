@@ -108,6 +108,8 @@ IP multicast to deliver information along multicast trees. Multicast
 extensions to QUIC have already been proposed in
 {{I-D.pardue-quic-http-mcast}} and {{I-D.jholland-quic-multicast-05}}.
 To our knowledge, these extensions have not been fully implemented and deployed.
+Additionally, these solutions suggest to share a QUIC connection between multiple receivers from a specific source, as well as individual connections.
+This design requires applications to handle two distinct connections in case of packet losses and multicast failures.
 
 
 Flexicast QUIC takes a different approach. Instead of extending QUIC {{QUIC-TRANSPORT}},
@@ -155,29 +157,29 @@ identifiers advertised by the smartphone. The smartphone confirms the establishm
 of the second path using a PATH_RESPONSE. At this point that smartphone and the
 server have two paths to exchange data: the first over the cellular interface
 and the second over the Wi-Fi interface. Each path uses a different sequence number
-space, but QUIC packets are encrypted using the same connection keys over both paths.
+space, but QUIC packets are encrypted using the same connection keys using a per-path IV construct.
 When a QUIC packet needs to be sent, the packet scheduler selects the relevant path.
 If a QUIC frame is lost over one path, it can be retransmitted over any other
 path.
 
-Flexicast QUIC extends Multipath QUIC by requiring that each path uses different
+Flexicast QUIC extends Multipath QUIC by using different
 encryption and decryption keys. As such, multiple clients can share the same additional
 path which is encrypted with a different key than their respective unicast path.
 The IP destination address of this new, shared path MAY be a multicast address,
 so that all receivers attached to this multicast tree receive the same packet.
 
-The case were the IP destination address is _not_ an IP multicast address is discussed
+The case where the IP destination address is _not_ an IP multicast address is discussed
 later in this document. In this case, Flexicast QUIC uses packet replication at the
 source, e.g., using sendmmsg, using the unicast destination address of the receivers.
 This solution scales at the source because Flexicast QUIC generates and encrypts only one packet,
 and duplicating the bytes is straightforward.
 
-A Flexicast QUIC connection starts with a handshake like a regular QUIC
+A Flexicast QUIC connection starts with a unicast handshake, similarly to a regular QUIC
 connection. Receivers R1, R2 and R3 establish a connection to source S using the
 flexicast_support and the initial_max_path_id transport parameters.
 The initial path between each receiver and the source are individually secured using
-the keys derived at connection establishement. They remain open during the whole
-communication and constitute a unicast bidirectional path between the source and
+the keys derived at connection establishement. It remains open during the whole
+flexicast session and constitute a unicast bidirectional path between the source and
 each receiver. This path is used for two very different purposes.
 First, it acts as a control channel and enables the source to
 exchange control information with each receiver. Second, it can be used to transmit
@@ -235,11 +237,11 @@ an FC_KEY frame containing the shared keys.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {: #fig-flexicast-2 title="A Flexicast QUIC connection is composed of two types of paths: (1) one bidirectional, unique, unicast path between the source and each receiver and (2) a flexicast flow from the source to a set of receivers relying on a multicast distribution tree"}
 
+Transitions between sending application data on a flexicast flow and a unicast path is seamless thanks to the underlying Multipath QUIC extension.
 At any point in time, if the network conditions of a receiver of a flexicast flow degrade,
 e.g., because the underlying multicast tree fails or because the receiver moves into a
 non-multicast network, it can leave the flexicast flow and continue receiving content
-through its unicast path. The seamless transition between a flexicast flow and a unicast path
-is possible because these are Multipath QUIC paths.
+through its unicast path.
 
 Flexicast QUIC offers full reliability by retransmitting lost frames either to all receivers
 on the flexicast flow, or per-receiver using their unicast path.
@@ -279,10 +281,9 @@ To join the flexicast flow, the receivers must be informed of the (S,G) tuple of
 underlying IP multicast tree. The server uses the FC_ANNOUNCE frame to
 advertise the identifier of the multicast tree that the receivers can join.
 
-The Flexicast QUIC packets that are sent over the flexicast flow must
-be encrypted and authenticated. However, these packets cannot be encrypted using
-the TLS keys derived during the QUIC connection establishment since each unicast
-path has its own set of TLS keys. To secure the transmission of Flexicast QUIC
+The Flexicast QUIC packets that are sent over the flexicast flow are
+be encrypted and authenticated. However, these packets are not encrypted using
+the TLS keys derived during the QUIC connection establishment since they are unique to the receiver. To secure the transmission of Flexicast QUIC
 packets along the flexicast flow, the source generates an independent set of
 security keys and shares them using the FC_KEY frame (see {{fc-key-frame}}) to all receivers over
 the unicast path. Since this frame is sent over the unicast paths, it is authenticated
@@ -297,7 +298,7 @@ Flexicast QUIC defines a new transport parameter, used to negotiate the use of
 the flexicast extension during the connection handshake, as specified in {{QUIC-TRANSPORT}}.
 The new transport parameter is defined as follows:
 
-* flexicast_support (current version uses TBD-03): the presence of this transport parameter indicates support of the flexicast extension. The transport parameter contains two boolean values, respectively indicating support of IPv4 and IPv6 for multicast addresses. If an endpoint receives the flexicast_support transport parameter with both IPv4 and IPv6 supports set to false (0), it must close the connection with an error type of FC_PROTOCOL_VIOLATION.
+* flexicast_support (current version uses TBD-03): this transport parameter indicates support of the flexicast extension. The transport parameter contains two boolean values, respectively indicating support of IPv4 and IPv6 for multicast addresses. If an endpoint receives the flexicast_support transport parameter with both IPv4 and IPv6 supports set to false (0), it must close the connection with an error type of FC_PROTOCOL_VIOLATION.
 
 The support of the flexicast extension is conditioned to the support of the multipath extension, as defined in {{MULTIPATH-QUIC}}.
 Since a Flexicast flow is a new multipath path, the support of multipath, with sufficient (e.g., at least 2) path ID, is required, as defined in {{Section 2 of MULTIPATH-QUIC}}.
