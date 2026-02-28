@@ -106,7 +106,7 @@ The deployment of QUIC opens an interesting opportunity to reconsider the
 utilization of IP Multicast. As QUIC runs above UDP, it could easily use
 IP multicast to deliver information along multicast trees, while offering the native reliability and security features of the protocol. Multicast
 extensions to QUIC have already been proposed in
-{{I-D.pardue-quic-http-mcast}} and {{I-D.jholland-quic-multicast-05}}.
+{{I-D.pardue-quic-http-mcast}} and {{I-D.jholland-quic-multicast-08}}.
 To our knowledge, these extensions have not been fully implemented and deployed.
 Additionally, these solutions suggest to share a QUIC connection between multiple receivers from a specific source, as well as individual connections.
 This design requires applications to handle two distinct connections in case of packet losses and multicast failures.
