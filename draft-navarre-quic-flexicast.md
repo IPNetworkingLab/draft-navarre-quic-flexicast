@@ -321,7 +321,7 @@ over the multicast flow.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Source (Unicast path)                         Receiver                      Source (multicast flow)
 
-QUIC handshake      <------------>      QUIC handshake          
+QUIC handshake      <------------>      QUIC handshake
 
 FC_ANNOUNCE         ------------->
                     <-------------      FC_STATE(JOIN)
