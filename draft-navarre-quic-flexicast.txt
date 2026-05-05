@@ -5,8 +5,8 @@
 QUIC                                                          L. Navarre
 Internet-Draft                                                 UCLouvain
 Intended status: Experimental                             O. Bonaventure
-Expires: 1 September 2026                              UCLouvain & WELRI
-                                                        28 February 2026
+Expires: 6 November 2026                               UCLouvain & WELRI
+                                                              5 May 2026
 
 
     Flexicast QUIC: combining unicast and multicast in a single QUIC
@@ -50,7 +50,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 1 September 2026.
+   This Internet-Draft will expire on 6 November 2026.
 
 Copyright Notice
 
@@ -936,15 +936,15 @@ FC_KEY              ------------->
 
    LEAVE (0x02): The receiver leaves the Multicast flow.
 
-   READY (0x03): The receiver is ready to receive content on the
+   LISTEN (0x03): The receiver is ready to receive content on the
    Multicast flow.
 
-   The JOIN and READY actions are receiver-specific.  These actions MUST
-   NOT be sent inside an FC_STATE frame sent by the source.  A receiver
-   receiving an FC_STATE frame with any of the following actions MUST
-   treat it as a connection error of type FC_PROTOCOL_VIOLATION.  The
-   action LEAVE MAY be sent by both the receiver and the source, as
-   detailed in Section 6.
+   The JOIN and LISTEN actions are receiver-specific.  These actions
+   MUST NOT be sent inside an FC_STATE frame sent by the source.  A
+   receiver receiving an FC_STATE frame with any of the following
+   actions MUST treat it as a connection error of type
+   FC_PROTOCOL_VIOLATION.  The action LEAVE MAY be sent by both the
+   receiver and the source, as detailed in Section 6.
 
 11.3.  FC_KEY frame
 
@@ -1116,9 +1116,9 @@ FC_KEY              ------------->
               Liu, Y., Ma, Y., De Coninck, Q., Bonaventure, O., Huitema,
               C., and M. Kühlewind, "Managing multiple paths for a QUIC
               connection", Work in Progress, Internet-Draft, draft-ietf-
-              quic-multipath-20, 20 February 2026,
+              quic-multipath-21, 17 March 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
-              multipath-20>.
+              multipath-21>.
 
    [QUIC-TLS] Thomson, M., Ed. and S. Turner, Ed., "Using TLS to Secure
               QUIC", RFC 9001, DOI 10.17487/RFC9001, May 2021,
