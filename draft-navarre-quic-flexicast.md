@@ -645,9 +645,9 @@ JOIN (0x01): The receiver joins the Multicast flow.
 
 LEAVE (0x02): The receiver leaves the Multicast flow.
 
-READY (0x03): The receiver is ready to receive content on the Multicast flow.
+LISTEN (0x03): The receiver is ready to receive content on the Multicast flow.
 
-The JOIN and READY actions are receiver-specific. These actions MUST NOT be sent inside an FC_STATE frame sent by the source. A receiver receiving an FC_STATE frame with any of the following actions MUST treat it as a connection error of type FC_PROTOCOL_VIOLATION.
+The JOIN and LISTEN actions are receiver-specific. These actions MUST NOT be sent inside an FC_STATE frame sent by the source. A receiver receiving an FC_STATE frame with any of the following actions MUST treat it as a connection error of type FC_PROTOCOL_VIOLATION.
 The action LEAVE MAY be sent by both the receiver and the source, as detailed in {{sec-leave}}.
 
 ## FC_KEY frame {#fc-key-frame}
