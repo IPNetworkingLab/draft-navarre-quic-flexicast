@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-05-05T01:56:51.676566+00:00",
+  "timestamp": "2026-05-07T01:59:15.708283+00:00",
   "repo": "IPNetworkingLab/draft-navarre-quic-flexicast",
   "labels": [
     {
@@ -150,24 +150,26 @@
       "id": "PR_kwDOKWZDcM7WxiPh",
       "title": "replace READY by LISTEN in FC_STATE frame",
       "url": "https://github.com/IPNetworkingLab/draft-navarre-quic-flexicast/pull/4",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "resowifix",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "It seems that these two actions does the same thing.\r\nI tried to guess which of them came the latest, but I can be wrong.",
       "createdAt": "2026-04-29T15:24:59Z",
-      "updatedAt": "2026-04-29T15:24:59Z",
+      "updatedAt": "2026-05-05T14:35:26Z",
       "baseRepository": "IPNetworkingLab/draft-navarre-quic-flexicast",
       "baseRefName": "main",
       "baseRefOid": "f9b1797b0004052b726586480c7a26b8a9a4d012",
       "headRepository": "resowifix/draft-navarre-quic-flexicast",
       "headRefName": "asirven-patch-1",
       "headRefOid": "53d3bdecd42c71791a118da81ab8b1769eaaeb84",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-05-05T14:35:26Z",
+      "mergedAt": "2026-05-05T14:35:25Z",
+      "mergedBy": "louisna",
+      "mergeCommit": {
+        "oid": "e845da166890cf831bf7d6ad12d7b45af43f90c9"
+      },
       "comments": [],
       "reviews": []
     }
