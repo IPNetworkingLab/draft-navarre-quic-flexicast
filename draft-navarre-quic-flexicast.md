@@ -784,13 +784,20 @@ https://www.iana.org/assignments/quic/quic.xhtml#quic-transport
 # Existing implementation and initial results.
 
 The design of Flexicast QUIC is presented in a scientific paper, accepted at ACM SIGCOMM Computer Communication Review (CCR) {{FCQUIC}}.
-We provide a proof of concept implementation of Flexicast QUIC, relying on Cloudflare quiche and the multipath extension.
-The source code of Flexicast QUIC is freely available for experimentations at https://github.com/IPNetworkingLab/flexicast-quic.
+We provide two proof-of-concept implementations of Flexicast QUIC clients and servers in different programming languages to demonstrate interoperability:
+- Based on Cloudflare quiche (Rust): https://github.com/IPNetworkingLab/flexicast-quic. Complete support of Flexicast QUIC client and server
+- Based on picoquic (C): https://github.com/resowifix/picoquic_flexicast. Complete support of Flexicast QUIC client. Working Flexicast QUIC server with DATAGRAM frames only (i.e., no reliability guaranteed on the multicast flow).
+
+Moreover, we are working to extend the QUIC Interop Runner to include basic tests for Flexicast QUIC. The project is available: https://github.com/resowifix/quic-interop-runner/tree/flexicast.
+
+Finally, we are working on extending the Wireshark project to support Flexicast frames decoding: https://gitlab.com/resowifix/wireshark.
 
 # Acknowledgments
 {:numbered="false"}
 
 Louis Navarre was partially funded as an F.R.S-FNRS Research Fellow.
 This work has been partially supported by the Walloon Region as part of the funding of the FRFS-WEL-T strategic axis.
+
+We thank Ambroise Sirven (resowifix) for his contributions to the proofreading of the draft, for his implementation of Flexicast QUIC in picoquic, and for his extensions of Wireshark and the QUIC Interop Runner for Flexicast support.
 
 We thank Maxime Piraux and Gorry Fairhurst for their valuable reviews.
