@@ -5,8 +5,8 @@
 QUIC                                                          L. Navarre
 Internet-Draft                                                 UCLouvain
 Intended status: Experimental                             O. Bonaventure
-Expires: 6 November 2026                               UCLouvain & WELRI
-                                                              5 May 2026
+Expires: 2 January 2027                                UCLouvain & WELRI
+                                                             1 July 2026
 
 
     Flexicast QUIC: combining unicast and multicast in a single QUIC
@@ -50,7 +50,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 6 November 2026.
+   This Internet-Draft will expire on 2 January 2027.
 
 Copyright Notice
 
@@ -1216,7 +1216,7 @@ FC_KEY              ------------->
    [rQUIC]    Garrido, P., Sanchez, I., Ferlin, S., Aguero, R., and O.
               Alay, "rQUIC: Integrating FEC with QUIC for Robust
               Wireless Communications", IEEE, 2019 IEEE Global
-              Communications Conference (GLOBECOM),
+              Communications Conference (GLOBECOM) pp. 1-7,
               DOI 10.1109/globecom38437.2019.9013401, December 2019,
               <https://doi.org/10.1109/globecom38437.2019.9013401>.
 
@@ -1224,16 +1224,32 @@ Appendix A.  Existing implementation and initial results.
 
    The design of Flexicast QUIC is presented in a scientific paper,
    accepted at ACM SIGCOMM Computer Communication Review (CCR) [FCQUIC].
-   We provide a proof of concept implementation of Flexicast QUIC,
-   relying on Cloudflare quiche and the multipath extension.  The source
-   code of Flexicast QUIC is freely available for experimentations at
-   https://github.com/IPNetworkingLab/flexicast-quic.
+   We provide two proof-of-concept implementations of Flexicast QUIC
+   clients and servers in different programming languages to demonstrate
+   interoperability: - Based on Cloudflare quiche (Rust):
+   https://github.com/IPNetworkingLab/flexicast-quic.  Complete support
+   of Flexicast QUIC client and server - Based on picoquic (C):
+   https://github.com/resowifix/picoquic_flexicast.  Complete support of
+   Flexicast QUIC client.  Working Flexicast QUIC server with DATAGRAM
+   frames only (i.e., no reliability guaranteed on the multicast flow).
+
+   Moreover, we are working to extend the QUIC Interop Runner to include
+   basic tests for Flexicast QUIC.  The project is available:
+   https://github.com/resowifix/quic-interop-runner/tree/flexicast.
+
+   Finally, we are working on extending the Wireshark project to support
+   Flexicast frames decoding: https://gitlab.com/resowifix/wireshark.
 
 Acknowledgments
 
    Louis Navarre was partially funded as an F.R.S-FNRS Research Fellow.
    This work has been partially supported by the Walloon Region as part
    of the funding of the FRFS-WEL-T strategic axis.
+
+   We thank Ambroise Sirven (resowifix) for his contributions to the
+   proofreading of the draft, for his implementation of Flexicast QUIC
+   in picoquic, and for his extensions of Wireshark and the QUIC Interop
+   Runner for Flexicast support.
 
    We thank Maxime Piraux and Gorry Fairhurst for their valuable
    reviews.
